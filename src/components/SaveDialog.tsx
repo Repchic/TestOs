@@ -32,8 +32,6 @@ export default function SaveDialog({ isOpen, onClose, onSave, suggestedFileName,
     return path;
   }, [currentFolderId, fileSystem]);
 
-  const currentFolder = fileSystem.find(f => f.id === currentFolderId);
-
   const checkFileExists = (name: string): boolean => {
     return fileSystem.some(
       f => f.parentId === currentFolderId && f.name === name && f.type === 'file' && !f.isDeleted
