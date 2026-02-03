@@ -95,9 +95,9 @@ export default function NotesApp() {
                   : 'border-gray-200 hover:bg-gray-100'
               }`}
             >
-              <div className="font-semibold truncate">{note.title}</div>
-              <div className="text-sm opacity-70 truncate">{note.content}</div>
-              <div className="text-xs opacity-50 mt-1">
+              <div className={`font-semibold truncate ${selectedNote?.id === note.id ? '' : isDarkMode ? 'text-white' : 'text-black'}`}>{note.title}</div>
+              <div className={`text-sm opacity-70 truncate ${selectedNote?.id === note.id ? '' : isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{note.content}</div>
+              <div className={`text-xs opacity-50 mt-1 ${selectedNote?.id === note.id ? '' : isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {note.modified.toLocaleDateString()}
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function NotesApp() {
                 value={selectedNote.title}
                 onChange={e => updateNote({ title: e.target.value })}
                 className={`text-xl font-semibold flex-1 outline-none ${
-                  isDarkMode ? 'bg-transparent text-white' : 'bg-transparent'
+                  isDarkMode ? 'bg-transparent text-white' : 'bg-transparent text-black'
                 }`}
                 disabled={!editMode}
               />
@@ -145,7 +145,7 @@ export default function NotesApp() {
                 value={selectedNote.content}
                 onChange={e => updateNote({ content: e.target.value })}
                 className={`w-full h-full resize-none outline-none ${
-                  isDarkMode ? 'bg-transparent text-white' : 'bg-transparent'
+                  isDarkMode ? 'bg-transparent text-white' : 'bg-transparent text-black'
                 }`}
                 placeholder="Start typing..."
                 disabled={!editMode}
@@ -153,7 +153,7 @@ export default function NotesApp() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
+          <div className={`flex-1 flex items-center justify-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Select a note or create a new one
           </div>
         )}

@@ -129,12 +129,12 @@ export default function TextEditor({ windowId, data }: Props) {
             type="text"
             value={fileName}
             onChange={e => setFileName(e.target.value)}
-            className={`px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} outline-none focus:ring-2 focus:ring-blue-500`}
+            className={`px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'} outline-none focus:ring-2 focus:ring-blue-500`}
           />
           <select
             value={language}
             onChange={e => setLanguage(e.target.value)}
-            className={`px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} outline-none`}
+            className={`px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'} outline-none`}
           >
             {languages.map(lang => (
               <option key={lang.value} value={lang.value}>
@@ -151,14 +151,14 @@ export default function TextEditor({ windowId, data }: Props) {
           >
             Save
           </button>
-          <span className="text-sm">Font Size:</span>
+          <span className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>Font Size:</span>
           <button
             onClick={() => setFontSize(prev => Math.max(10, prev - 2))}
             className={`px-2 py-1 rounded ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
           >
             -
           </button>
-          <span className="text-sm w-8 text-center">{fontSize}</span>
+          <span className={`text-sm w-8 text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>{fontSize}</span>
           <button
             onClick={() => setFontSize(prev => Math.min(24, prev + 2))}
             className={`px-2 py-1 rounded ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}

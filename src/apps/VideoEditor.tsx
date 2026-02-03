@@ -58,7 +58,7 @@ export default function VideoEditor() {
             ⏮ Reset
           </button>
           <div className="flex-1 flex items-center gap-2">
-            <span className="text-sm">{Math.floor(currentTime)}s</span>
+            <span className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>{Math.floor(currentTime)}s</span>
             <input
               type="range"
               min="0"
@@ -67,7 +67,7 @@ export default function VideoEditor() {
               onChange={e => setCurrentTime(Number(e.target.value))}
               className="flex-1"
             />
-            <span className="text-sm">{Math.floor(totalDuration)}s</span>
+            <span className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>{Math.floor(totalDuration)}s</span>
           </div>
           <button
             onClick={addClip}
@@ -78,9 +78,9 @@ export default function VideoEditor() {
         </div>
 
         <div className={`rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4`}>
-          <div className="text-sm font-semibold mb-3">Timeline</div>
+          <div className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-black'}`}>Timeline</div>
           {clips.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               No clips in timeline. Click "Add Clip" to begin.
             </div>
           ) : (
@@ -100,8 +100,8 @@ export default function VideoEditor() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🎞️</div>
                     <div>
-                      <div className="font-medium">{clip.name}</div>
-                      <div className="text-sm opacity-70">
+                      <div className={`font-medium ${selectedClip === clip.id ? '' : isDarkMode ? 'text-white' : 'text-black'}`}>{clip.name}</div>
+                      <div className={`text-sm opacity-70 ${selectedClip === clip.id ? '' : isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                         {clip.duration}s • Start: {clip.start}s
                       </div>
                     </div>
@@ -130,7 +130,7 @@ export default function VideoEditor() {
 
       <div className={`border-t ${isDarkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'} p-4`}>
         <div className="flex items-center justify-between">
-          <div className="text-sm">
+          <div className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>
             <span className="font-semibold">Total Duration:</span> {Math.floor(totalDuration)}s
           </div>
           <button

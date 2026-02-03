@@ -90,19 +90,19 @@ export default function SaveDialog({ isOpen, onClose, onSave, suggestedFileName,
         <div
           className={`px-6 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}
         >
-          <h2 className="text-xl font-semibold">Save File</h2>
+          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-black'}`}>Save File</h2>
         </div>
 
         <div className="flex-1 overflow-auto p-6">
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Save location:</label>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>Save location:</label>
             <div className={`flex items-center gap-2 p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
               {breadcrumbs.map((folder, index) => (
                 <div key={folder.id} className="flex items-center gap-2">
                   {index > 0 && <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>/</span>}
                   <button
                     onClick={() => setCurrentFolderId(folder.id)}
-                    className={`hover:underline ${index === breadcrumbs.length - 1 ? 'font-semibold' : ''}`}
+                    className={`hover:underline ${index === breadcrumbs.length - 1 ? 'font-semibold' : ''} ${isDarkMode ? 'text-white' : 'text-black'}`}
                   >
                     {folder.name}
                   </button>
@@ -112,7 +112,7 @@ export default function SaveDialog({ isOpen, onClose, onSave, suggestedFileName,
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Folder contents:</label>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>Folder contents:</label>
             <div
               className={`border rounded-lg p-4 h-48 overflow-auto ${
                 isDarkMode ? 'border-gray-700' : 'border-gray-300'
@@ -134,7 +134,7 @@ export default function SaveDialog({ isOpen, onClose, onSave, suggestedFileName,
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">📁</span>
-                        <span className="truncate">{item.name}</span>
+                        <span className={`truncate ${isDarkMode ? 'text-white' : 'text-black'}`}>{item.name}</span>
                       </div>
                     </button>
                   ))}
@@ -144,7 +144,7 @@ export default function SaveDialog({ isOpen, onClose, onSave, suggestedFileName,
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">File name:</label>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>File name:</label>
             <input
               type="text"
               value={fileName}

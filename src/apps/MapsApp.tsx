@@ -74,8 +74,8 @@ export default function MapsApp() {
           <div className="flex items-start gap-3">
             <div className="text-3xl">📍</div>
             <div>
-              <div className="font-semibold">{location}</div>
-              <div className="text-sm opacity-70 mt-1">
+              <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-black'}`}>{location}</div>
+              <div className={`text-sm opacity-70 mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Interactive map showing the selected location
               </div>
             </div>
