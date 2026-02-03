@@ -51,10 +51,11 @@ export default function Terminal() {
       case 'date':
         output = new Date().toString() + '\n';
         break;
-      case 'ls':
+      case 'ls': {
         const files = fileSystem.filter(f => !f.isDeleted && f.parentId === 'root');
         output = files.map(f => `${f.type === 'folder' ? '📁' : '📄'} ${f.name}`).join('\n') + '\n';
         break;
+      }
       case 'pwd':
         output = '/home/user\n';
         break;
@@ -64,7 +65,7 @@ export default function Terminal() {
       case 'uname':
         output = 'Web OS 1.0.0 (Browser)\n';
         break;
-      case 'cat':
+      case 'cat': {
         if (args.length === 0) {
           output = 'cat: missing file operand\n';
         } else {
@@ -76,15 +77,16 @@ export default function Terminal() {
           }
         }
         break;
+      }
       case 'calc':
         if (args.length === 0) {
           output = 'calc: missing expression\n';
         } else {
           try {
             const expr = args.join('').replace(/[^0-9+\-*/().]/g, '');
-            const result = eval(expr);
+            const result = Function('"use strict"; return (' + expr + ')')();
             output = `${result}\n`;
-          } catch (e) {
+          } catch {
             output = 'calc: invalid expression\n';
           }
         }

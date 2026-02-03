@@ -27,6 +27,7 @@ export default function PaintApp() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     saveToHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveToHistory = () => {

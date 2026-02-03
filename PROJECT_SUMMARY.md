@@ -42,8 +42,8 @@
 | Number of Applications | 12 |
 | Number of Components | 15+ |
 | TypeScript Coverage | 100% |
-| Build Time | ~1.3 seconds |
-| Bundle Size (gzipped) | ~69 KB |
+| Build Time | ~2 seconds |
+| Bundle Size (gzipped) | ~68 KB |
 | Page Load Time | < 1 second |
 | Browser Support | Chrome, Firefox, Safari, Edge |
 
@@ -284,9 +284,9 @@ This project demonstrates:
 
 | Metric | Result | Target | Status |
 |--------|--------|--------|--------|
-| Build Time | 1.3s | < 3s | ✅ Excellent |
-| Bundle Size | 233 KB | < 500 KB | ✅ Excellent |
-| Gzipped Size | 69 KB | < 150 KB | ✅ Excellent |
+| Build Time | ~2s | < 3s | ✅ Excellent |
+| Bundle Size | 219 KB | < 500 KB | ✅ Excellent |
+| Gzipped Size | 68 KB | < 150 KB | ✅ Excellent |
 | First Paint | < 500ms | < 1s | ✅ Excellent |
 | Time to Interactive | < 1s | < 2s | ✅ Excellent |
 | Lighthouse Score | TBD | > 90 | ⏳ To Test |
