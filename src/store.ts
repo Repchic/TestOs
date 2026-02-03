@@ -69,7 +69,7 @@ interface OSState {
   toggleDarkMode: () => void;
   toggleSpotlight: () => void;
   
-  createFile: (name: string, type: 'file' | 'folder', parentId: string | null, content?: string) => void;
+  createFile: (name: string, type: 'file' | 'folder', parentId: string | null, content?: string) => string;
   updateFile: (id: string, updates: Partial<FileSystemNode>) => void;
   deleteFile: (id: string) => void;
   restoreFile: (id: string) => void;
@@ -262,6 +262,7 @@ export const useStore = create<OSState>((set, get) => ({
       saveFileSystem(newFileSystem);
       return { fileSystem: newFileSystem };
     });
+    return newFile.id;
   },
   
   updateFile: (id, updates) => {

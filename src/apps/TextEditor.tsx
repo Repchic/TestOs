@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { useStore } from '../store';
+import SaveDialog from '../components/SaveDialog';
 
 interface Props {
   windowId: string;
@@ -8,11 +9,12 @@ interface Props {
 }
 
 export default function TextEditor({ windowId, data }: Props) {
-  const { updateWindowData, isDarkMode, fileSystem, updateFile } = useStore();
+  const { updateWindowData, isDarkMode, fileSystem, updateFile, createFile, addNotification } = useStore();
   const [content, setContent] = useState(data?.content || '// Start coding...\n');
   const [language, setLanguage] = useState(data?.language || 'javascript');
   const [fontSize, setFontSize] = useState(14);
   const [fileName, setFileName] = useState(data?.fileName || 'untitled.js');
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   useEffect(() => {
     if (data?.fileId) {
@@ -47,15 +49,77 @@ export default function TextEditor({ windowId, data }: Props) {
   };
 
   const languages = [
-    { value: 'javascript', label: 'JavaScript' },
-    { value: 'typescript', label: 'TypeScript' },
-    { value: 'python', label: 'Python' },
-    { value: 'html', label: 'HTML' },
-    { value: 'css', label: 'CSS' },
-    { value: 'json', label: 'JSON' },
-    { value: 'markdown', label: 'Markdown' },
-    { value: 'plaintext', label: 'Plain Text' },
+    { value: 'javascript', label: 'JavaScript', extension: '.js' },
+    { value: 'typescript', label: 'TypeScript', extension: '.ts' },
+    { value: 'python', label: 'Python', extension: '.py' },
+    { value: 'html', label: 'HTML', extension: '.html' },
+    { value: 'css', label: 'CSS', extension: '.css' },
+    { value: 'json', label: 'JSON', extension: '.json' },
+    { value: 'markdown', label: 'Markdown', extension: '.md' },
+    { value: 'plaintext', label: 'Plain Text', extension: '.txt' },
   ];
+
+  const getExtension = (lang: string): string => {
+    const langObj = languages.find(l => l.value === lang);
+    return langObj ? langObj.extension : '.txt';
+  };
+
+  const getSuggestedFileName = (): string => {
+    if (data?.fileId) {
+      return fileName;
+    }
+    const baseName = fileName.replace(/\.[^/.]+$/, '');
+    return baseName || 'untitled';
+  };
+
+  const handleSave = (folderId: string, saveFileName: string) => {
+    const existingFile = fileSystem.find(
+      f => f.parentId === folderId && f.name === saveFileName && f.type === 'file' && !f.isDeleted
+    );
+
+    let fileId: string;
+
+    if (existingFile) {
+      updateFile(existingFile.id, { content });
+      fileId = existingFile.id;
+    } else {
+      fileId = createFile(saveFileName, 'file', folderId, content);
+    }
+    
+    updateWindowData(windowId, {
+      fileId,
+      fileName: saveFileName,
+      content,
+      language,
+    });
+
+    setFileName(saveFileName);
+    
+    addNotification({
+      title: 'File Saved',
+      message: `Successfully saved ${saveFileName}`,
+    });
+  };
+
+  const handleSaveShortcut = (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      if (data?.fileId) {
+        updateFile(data.fileId, { content });
+        addNotification({
+          title: 'File Saved',
+          message: `Successfully saved ${fileName}`,
+        });
+      } else {
+        setShowSaveDialog(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleSaveShortcut);
+    return () => window.removeEventListener('keydown', handleSaveShortcut);
+  }, [content, fileName, data?.fileId]);
 
   return (
     <div className="h-full flex flex-col">
@@ -81,6 +145,12 @@ export default function TextEditor({ windowId, data }: Props) {
         </div>
         
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSaveDialog(true)}
+            className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium"
+          >
+            Save
+          </button>
           <span className="text-sm">Font Size:</span>
           <button
             onClick={() => setFontSize(prev => Math.max(10, prev - 2))}
@@ -116,6 +186,14 @@ export default function TextEditor({ windowId, data }: Props) {
           }}
         />
       </div>
+
+      <SaveDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSave}
+        suggestedFileName={`${getSuggestedFileName()}${getExtension(language)}`}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 }
