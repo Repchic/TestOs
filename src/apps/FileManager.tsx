@@ -59,6 +59,7 @@ export default function FileManager({ data }: Props) {
   const handleItemClick = (item: FileSystemNode) => {
     if (item.type === 'folder') {
       setCurrentFolderId(item.id);
+      setSelectedFiles(new Set());
     } else {
       openWindow('text-editor', item.name, { content: item.content, fileId: item.id, fileName: item.name });
     }
@@ -125,7 +126,10 @@ export default function FileManager({ data }: Props) {
             <div key={folder.id} className="flex items-center gap-2">
               {index > 0 && <span>/</span>}
               <button
-                onClick={() => setCurrentFolderId(folder.id)}
+                onClick={() => {
+                  setCurrentFolderId(folder.id);
+                  setSelectedFiles(new Set());
+                }}
                 className={`hover:underline ${index === breadcrumbs.length - 1 ? 'font-semibold' : ''}`}
               >
                 {folder.name}
@@ -199,7 +203,7 @@ export default function FileManager({ data }: Props) {
         </div>
       )}
 
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4" onClick={() => setSelectedFiles(new Set())}>
         {items.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
             {isTrash ? 'Trash is empty' : 'This folder is empty'}
@@ -216,7 +220,10 @@ export default function FileManager({ data }: Props) {
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
                 }`}
-                onClick={() => editingId !== item.id && handleItemClick(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  editingId !== item.id && handleItemClick(item);
+                }}
                 onContextMenu={e => {
                   e.preventDefault();
                   if (editingId !== item.id) {
@@ -299,7 +306,10 @@ export default function FileManager({ data }: Props) {
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
                 }`}
-                onClick={() => editingId !== item.id && handleItemClick(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  editingId !== item.id && handleItemClick(item);
+                }}
                 onContextMenu={e => {
                   e.preventDefault();
                   if (editingId !== item.id) {
