@@ -13,12 +13,32 @@ export default function Terminal() {
   ]);
   const [input, setInput] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [currentDirectory, setCurrentDirectory] = useState('root');
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [history]);
+
+  const getFolderPath = (folderId: string): string => {
+    if (folderId === 'root') return '/';
+    const parts: string[] = [];
+    let current = folderId;
+    while (current && current !== 'root') {
+      const folder = fileSystem.find(f => f.id === current);
+      if (!folder) break;
+      parts.unshift(folder.name);
+      current = folder.parentId || '';
+    }
+    return '/' + parts.join('/');
+  };
+
+  const getFolderName = (folderId: string): string => {
+    if (folderId === 'root') return '~';
+    const folder = fileSystem.find(f => f.id === folderId);
+    return folder ? folder.name : '~';
+  };
 
   const executeCommand = (cmd: string) => {
     const parts = cmd.trim().split(' ');
@@ -36,6 +56,7 @@ export default function Terminal() {
   date          - Show current date and time
   ls            - List files in current directory
   pwd           - Print working directory
+  cd [folder]   - Change directory (cd .. to go up)
   whoami        - Display current user
   uname         - Display system information
   cat [file]    - Display file contents
@@ -52,13 +73,42 @@ export default function Terminal() {
         output = new Date().toString() + '\n';
         break;
       case 'ls': {
-        const files = fileSystem.filter(f => !f.isDeleted && f.parentId === 'root');
+        const files = fileSystem.filter(f => !f.isDeleted && f.parentId === currentDirectory);
         output = files.map(f => `${f.type === 'folder' ? '📁' : '📄'} ${f.name}`).join('\n') + '\n';
         break;
       }
       case 'pwd':
-        output = '/home/user\n';
+        output = getFolderPath(currentDirectory) + '\n';
         break;
+      case 'cd': {
+        if (args.length === 0) {
+          output = 'cd: missing argument\n';
+        } else if (args[0] === '..') {
+          const current = fileSystem.find(f => f.id === currentDirectory);
+          if (current && current.parentId) {
+            const parent = fileSystem.find(f => f.id === current.parentId);
+            if (parent) {
+              setCurrentDirectory(current.parentId);
+              output = '';
+            } else {
+              output = 'cd: Invalid directory\n';
+            }
+          } else {
+            output = 'cd: already at root\n';
+          }
+        } else {
+          const targetFolder = fileSystem.find(
+            f => !f.isDeleted && f.type === 'folder' && f.name === args[0] && f.parentId === currentDirectory
+          );
+          if (targetFolder) {
+            setCurrentDirectory(targetFolder.id);
+            output = '';
+          } else {
+            output = `cd: ${args[0]}: No such directory\n`;
+          }
+        }
+        break;
+      }
       case 'whoami':
         output = 'user\n';
         break;
@@ -69,7 +119,9 @@ export default function Terminal() {
         if (args.length === 0) {
           output = 'cat: missing file operand\n';
         } else {
-          const file = fileSystem.find(f => f.name === args[0] && f.type === 'file');
+          const file = fileSystem.find(
+            f => f.name === args[0] && f.type === 'file' && f.parentId === currentDirectory && !f.isDeleted
+          );
           if (file) {
             output = (file.content || '(empty file)') + '\n';
           } else {
@@ -146,7 +198,7 @@ export default function Terminal() {
               <div>
                 <span className="text-blue-400">user@webos</span>
                 <span className="text-white">:</span>
-                <span className="text-purple-400">~</span>
+                <span className="text-purple-400">{getFolderName(currentDirectory)}</span>
                 <span className="text-white">$ </span>
                 <span>{cmd.input}</span>
               </div>
@@ -159,7 +211,7 @@ export default function Terminal() {
       <form onSubmit={handleSubmit} className="flex items-center">
         <span className="text-blue-400">user@webos</span>
         <span className="text-white">:</span>
-        <span className="text-purple-400">~</span>
+        <span className="text-purple-400">{getFolderName(currentDirectory)}</span>
         <span className="text-white">$ </span>
         <input
           ref={inputRef}
