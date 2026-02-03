@@ -127,7 +127,7 @@ export default function BrowserApp() {
 
         {showBookmarks && (
           <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <div className="text-sm font-semibold mb-2">Bookmarks</div>
+            <div className={`text-sm font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>Bookmarks</div>
             <div className="space-y-1">
               {bookmarks.map(bookmark => (
                 <div
@@ -140,8 +140,8 @@ export default function BrowserApp() {
                     isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
                   }`}
                 >
-                  <div className="font-medium">{bookmark.title}</div>
-                  <div className="text-xs opacity-60">{bookmark.url}</div>
+                  <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-black'}`}>{bookmark.title}</div>
+                  <div className={`text-xs opacity-60 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{bookmark.url}</div>
                 </div>
               ))}
             </div>

@@ -18,7 +18,7 @@ export default function MenuBar() {
   };
 
   return (
-    <div className={`fixed top-0 left-0 right-0 h-7 ${isDarkMode ? 'glass-dark' : 'glass'} flex items-center justify-between px-4 text-sm z-50 border-b ${isDarkMode ? 'border-gray-700' : 'border-white/20'}`}>
+    <div className={`fixed top-0 left-0 right-0 h-7 ${isDarkMode ? 'glass-dark' : 'glass'} flex items-center justify-between px-4 text-sm z-50 border-b ${isDarkMode ? 'border-gray-700 text-white' : 'border-white/20 text-black'}`}>
       <div className="flex items-center gap-4">
         <div className="font-semibold">🍎</div>
         <span className="font-medium">Web OS</span>

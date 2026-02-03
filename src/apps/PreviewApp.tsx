@@ -55,7 +55,7 @@ export default function PreviewApp() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm">Zoom:</span>
+              <span className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>Zoom:</span>
               <input
                 type="range"
                 min="10"
@@ -64,7 +64,7 @@ export default function PreviewApp() {
                 onChange={e => setZoom(Number(e.target.value))}
                 className="w-32"
               />
-              <span className="text-sm w-12">{zoom}%</span>
+              <span className={`text-sm w-12 ${isDarkMode ? 'text-white' : 'text-black'}`}>{zoom}%</span>
             </div>
           </div>
         )}

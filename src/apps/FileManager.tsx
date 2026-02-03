@@ -130,7 +130,7 @@ export default function FileManager({ data }: Props) {
                   setCurrentFolderId(folder.id);
                   setSelectedFiles(new Set());
                 }}
-                className={`hover:underline ${index === breadcrumbs.length - 1 ? 'font-semibold' : ''}`}
+                className={`hover:underline ${index === breadcrumbs.length - 1 ? 'font-semibold' : ''} ${isDarkMode ? 'text-white' : 'text-black'}`}
               >
                 {folder.name}
               </button>
@@ -253,7 +253,7 @@ export default function FileManager({ data }: Props) {
                     onClick={e => e.stopPropagation()}
                   />
                 ) : (
-                  <div className="text-sm text-center truncate">{item.name}</div>
+                  <div className={`text-sm text-center truncate ${isDarkMode ? 'text-white' : 'text-black'}`}>{item.name}</div>
                 )}
                 {selectedFiles.has(item.id) && editingId !== item.id && (
                   <div className="mt-2 flex gap-2 justify-center">
@@ -340,8 +340,8 @@ export default function FileManager({ data }: Props) {
                       />
                     ) : (
                       <>
-                        <div>{item.name}</div>
-                        <div className="text-xs opacity-60">
+                        <div className={isDarkMode ? 'text-white' : 'text-black'}>{item.name}</div>
+                        <div className={`text-xs opacity-60 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           {new Date(item.modified).toLocaleString()}
                         </div>
                       </>

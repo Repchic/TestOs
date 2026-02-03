@@ -203,7 +203,7 @@ export default function PaintApp() {
               className="w-8 h-8 rounded cursor-pointer"
             />
             <div className="flex items-center gap-2">
-              <span className="text-sm">Size:</span>
+              <span className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>Size:</span>
               <input
                 type="range"
                 min="1"
@@ -212,7 +212,7 @@ export default function PaintApp() {
                 onChange={e => setBrushSize(Number(e.target.value))}
                 className="w-24"
               />
-              <span className="text-sm w-6">{brushSize}</span>
+              <span className={`text-sm w-6 ${isDarkMode ? 'text-white' : 'text-black'}`}>{brushSize}</span>
             </div>
           </div>
         </div>

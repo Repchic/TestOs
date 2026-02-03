@@ -16,12 +16,12 @@ export default function Notifications() {
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <div className="font-semibold">{notification.title}</div>
-              <div className="text-sm mt-1 opacity-80">{notification.message}</div>
+              <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{notification.title}</div>
+              <div className={`text-sm mt-1 opacity-80 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{notification.message}</div>
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className={`transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}
             >
               ✕
             </button>

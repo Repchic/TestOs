@@ -126,7 +126,7 @@ export default function Window({ window }: Props) {
           />
         </div>
         
-        <div className="flex items-center gap-2 text-sm font-medium">
+        <div className={`flex items-center gap-2 text-sm font-medium ${isDarkMode ? 'text-white' : 'text-black'}`}>
           {app?.icon && <span>{app.icon}</span>}
           <span>{window.title}</span>
         </div>

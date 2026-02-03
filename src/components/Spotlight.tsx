@@ -98,8 +98,8 @@ export default function Spotlight() {
               >
                 <span className="text-3xl">{app.icon}</span>
                 <div>
-                  <div className="font-medium">{app.name}</div>
-                  <div className={`text-sm ${index === selectedIndex ? 'text-white/80' : 'text-gray-500'}`}>
+                  <div className={`font-medium ${index === selectedIndex ? 'text-white' : isDarkMode ? 'text-white' : 'text-black'}`}>{app.name}</div>
+                  <div className={`text-sm ${index === selectedIndex ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {app.category}
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export default function Spotlight() {
         )}
         
         {query && filteredApps.length === 0 && (
-          <div className="px-4 py-8 text-center text-gray-500">
+          <div className={`px-4 py-8 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             No applications found
           </div>
         )}
