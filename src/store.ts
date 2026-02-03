@@ -1,6 +1,53 @@
 import { create } from 'zustand';
 import { Window, FileSystemNode, NotificationItem } from './types';
 
+const FILE_SYSTEM_STORAGE_KEY = 'webos-filesystem';
+
+// Serialize file system for localStorage (convert Date objects to ISO strings)
+const serializeFileSystem = (fileSystem: FileSystemNode[]): string => {
+  return JSON.stringify(fileSystem.map(node => ({
+    ...node,
+    created: node.created.toISOString(),
+    modified: node.modified.toISOString(),
+  })));
+};
+
+// Deserialize file system from localStorage (convert ISO strings back to Date objects)
+const deserializeFileSystem = (serialized: string): FileSystemNode[] => {
+  try {
+    return JSON.parse(serialized).map((node: any) => ({
+      ...node,
+      created: new Date(node.created),
+      modified: new Date(node.modified),
+    }));
+  } catch (error) {
+    console.warn('Failed to deserialize file system from localStorage:', error);
+    return createDefaultFileSystem();
+  }
+};
+
+// Load file system from localStorage or return default
+const loadFileSystem = (): FileSystemNode[] => {
+  try {
+    const saved = localStorage.getItem(FILE_SYSTEM_STORAGE_KEY);
+    if (saved) {
+      return deserializeFileSystem(saved);
+    }
+  } catch (error) {
+    console.warn('Failed to load file system from localStorage:', error);
+  }
+  return createDefaultFileSystem();
+};
+
+// Save file system to localStorage
+const saveFileSystem = (fileSystem: FileSystemNode[]) => {
+  try {
+    localStorage.setItem(FILE_SYSTEM_STORAGE_KEY, serializeFileSystem(fileSystem));
+  } catch (error) {
+    console.warn('Failed to save file system to localStorage:', error);
+  }
+};
+
 interface OSState {
   windows: Window[];
   nextZIndex: number;
@@ -86,7 +133,7 @@ export const useStore = create<OSState>((set, get) => ({
   nextZIndex: 1000,
   isDarkMode: false,
   showSpotlight: false,
-  fileSystem: createDefaultFileSystem(),
+  fileSystem: loadFileSystem(),
   notifications: [],
   currentWallpaper: defaultWallpaper,
   
@@ -210,33 +257,41 @@ export const useStore = create<OSState>((set, get) => ({
       created: now,
       modified: now,
     };
-    set(state => ({
-      fileSystem: [...state.fileSystem, newFile],
-    }));
+    set(state => {
+      const newFileSystem = [...state.fileSystem, newFile];
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
   },
   
   updateFile: (id, updates) => {
-    set(state => ({
-      fileSystem: state.fileSystem.map(f =>
+    set(state => {
+      const newFileSystem = state.fileSystem.map(f =>
         f.id === id ? { ...f, ...updates, modified: new Date() } : f
-      ),
-    }));
+      );
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
   },
   
   deleteFile: (id) => {
-    set(state => ({
-      fileSystem: state.fileSystem.map(f =>
+    set(state => {
+      const newFileSystem = state.fileSystem.map(f =>
         f.id === id ? { ...f, isDeleted: true, parentId: 'trash' } : f
-      ),
-    }));
+      );
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
   },
   
   restoreFile: (id) => {
-    set(state => ({
-      fileSystem: state.fileSystem.map(f =>
+    set(state => {
+      const newFileSystem = state.fileSystem.map(f =>
         f.id === id ? { ...f, isDeleted: false, parentId: 'root' } : f
-      ),
-    }));
+      );
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
   },
   
   addNotification: (notification) => {
