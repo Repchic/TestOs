@@ -10,6 +10,7 @@ export default function FileManager({ data }: Props) {
   const {
     fileSystem,
     createFile,
+    updateFile,
     deleteFile,
     restoreFile,
     openWindow,
@@ -23,6 +24,8 @@ export default function FileManager({ data }: Props) {
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [newItemName, setNewItemName] = useState('');
   const [showNewItem, setShowNewItem] = useState<'file' | 'folder' | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
 
   const currentFolder = fileSystem.find(f => f.id === currentFolderId);
   const isTrash = currentFolderId === 'trash';
@@ -69,6 +72,49 @@ export default function FileManager({ data }: Props) {
   const handleRestore = (id: string) => {
     restoreFile(id);
     setSelectedFiles(new Set());
+  };
+
+  const handleStartRename = (item: FileSystemNode) => {
+    setEditingId(item.id);
+    setEditingName(item.name);
+  };
+
+  const handleRename = () => {
+    if (!editingId || !editingName.trim()) {
+      setEditingId(null);
+      setEditingName('');
+      return;
+    }
+
+    const trimmedName = editingName.trim();
+    const item = fileSystem.find(f => f.id === editingId);
+    
+    if (!item) {
+      setEditingId(null);
+      setEditingName('');
+      return;
+    }
+
+    // Check for duplicate names in the same folder
+    const duplicateExists = items.some(
+      f => f.id !== editingId && f.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+
+    if (duplicateExists) {
+      setEditingId(null);
+      setEditingName('');
+      return;
+    }
+
+    updateFile(editingId, { name: trimmedName });
+    setEditingId(null);
+    setEditingName('');
+    setSelectedFiles(new Set());
+  };
+
+  const handleCancelRename = () => {
+    setEditingId(null);
+    setEditingName('');
   };
 
   return (
@@ -170,17 +216,39 @@ export default function FileManager({ data }: Props) {
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
                 }`}
-                onClick={() => handleItemClick(item)}
+                onClick={() => editingId !== item.id && handleItemClick(item)}
                 onContextMenu={e => {
                   e.preventDefault();
-                  setSelectedFiles(new Set([item.id]));
+                  if (editingId !== item.id) {
+                    setSelectedFiles(new Set([item.id]));
+                  }
                 }}
               >
                 <div className="text-5xl mb-2 text-center">
                   {item.type === 'folder' ? '📁' : '📄'}
                 </div>
-                <div className="text-sm text-center truncate">{item.name}</div>
-                {selectedFiles.has(item.id) && (
+                {editingId === item.id ? (
+                  <input
+                    type="text"
+                    value={editingName}
+                    onChange={e => setEditingName(e.target.value)}
+                    onKeyDown={e => {
+                      e.stopPropagation();
+                      if (e.key === 'Enter') {
+                        handleRename();
+                      } else if (e.key === 'Escape') {
+                        handleCancelRename();
+                      }
+                    }}
+                    onBlur={handleRename}
+                    className={`w-full text-sm text-center px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'} outline-none focus:ring-2 focus:ring-blue-500`}
+                    autoFocus
+                    onClick={e => e.stopPropagation()}
+                  />
+                ) : (
+                  <div className="text-sm text-center truncate">{item.name}</div>
+                )}
+                {selectedFiles.has(item.id) && editingId !== item.id && (
                   <div className="mt-2 flex gap-2 justify-center">
                     {isTrash ? (
                       <button
@@ -193,15 +261,26 @@ export default function FileManager({ data }: Props) {
                         Restore
                       </button>
                     ) : (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                        className="text-xs px-2 py-1 bg-white text-red-500 rounded"
-                      >
-                        Delete
-                      </button>
+                      <>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleStartRename(item);
+                          }}
+                          className="text-xs px-2 py-1 bg-white text-blue-500 rounded"
+                        >
+                          Rename
+                        </button>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDelete(item.id);
+                          }}
+                          className="text-xs px-2 py-1 bg-white text-red-500 rounded"
+                        >
+                          Delete
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
@@ -220,18 +299,46 @@ export default function FileManager({ data }: Props) {
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
                 }`}
-                onClick={() => handleItemClick(item)}
+                onClick={() => editingId !== item.id && handleItemClick(item)}
+                onContextMenu={e => {
+                  e.preventDefault();
+                  if (editingId !== item.id) {
+                    setSelectedFiles(new Set([item.id]));
+                  }
+                }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <span className="text-2xl">{item.type === 'folder' ? '📁' : '📄'}</span>
-                  <div>
-                    <div>{item.name}</div>
-                    <div className="text-xs opacity-60">
-                      {new Date(item.modified).toLocaleString()}
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    {editingId === item.id ? (
+                      <input
+                        type="text"
+                        value={editingName}
+                        onChange={e => setEditingName(e.target.value)}
+                        onKeyDown={e => {
+                          e.stopPropagation();
+                          if (e.key === 'Enter') {
+                            handleRename();
+                          } else if (e.key === 'Escape') {
+                            handleCancelRename();
+                          }
+                        }}
+                        onBlur={handleRename}
+                        className={`w-full px-2 py-1 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'} outline-none focus:ring-2 focus:ring-blue-500`}
+                        autoFocus
+                        onClick={e => e.stopPropagation()}
+                      />
+                    ) : (
+                      <>
+                        <div>{item.name}</div>
+                        <div className="text-xs opacity-60">
+                          {new Date(item.modified).toLocaleString()}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-                {selectedFiles.has(item.id) && (
+                {selectedFiles.has(item.id) && editingId !== item.id && (
                   <div className="flex gap-2">
                     {isTrash ? (
                       <button
@@ -244,15 +351,26 @@ export default function FileManager({ data }: Props) {
                         Restore
                       </button>
                     ) : (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                        className="px-3 py-1 bg-white text-red-500 rounded text-sm"
-                      >
-                        Delete
-                      </button>
+                      <>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleStartRename(item);
+                          }}
+                          className="px-3 py-1 bg-white text-blue-500 rounded text-sm"
+                        >
+                          Rename
+                        </button>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDelete(item.id);
+                          }}
+                          className="px-3 py-1 bg-white text-red-500 rounded text-sm"
+                        >
+                          Delete
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
