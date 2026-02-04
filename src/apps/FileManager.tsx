@@ -13,6 +13,8 @@ export default function FileManager({ data }: Props) {
     updateFile,
     deleteFile,
     restoreFile,
+    permanentlyDeleteFile,
+    permanentlyDeleteAll,
     openWindow,
     isDarkMode,
   } = useStore();
@@ -72,6 +74,21 @@ export default function FileManager({ data }: Props) {
 
   const handleRestore = (id: string) => {
     restoreFile(id);
+    setSelectedFiles(new Set());
+  };
+
+  const handlePermanentlyDelete = (id: string) => {
+    permanentlyDeleteFile(id);
+    setSelectedFiles(new Set());
+  };
+
+  const handlePermanentlyDeleteAll = () => {
+    permanentlyDeleteAll();
+    setSelectedFiles(new Set());
+  };
+
+  const handlePermanentlyDeleteSelected = () => {
+    selectedFiles.forEach(id => permanentlyDeleteFile(id));
     setSelectedFiles(new Set());
   };
 
@@ -152,6 +169,24 @@ export default function FileManager({ data }: Props) {
                 className={`px-3 py-1 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 📄 New File
+              </button>
+            </>
+          )}
+          {isTrash && (
+            <>
+              {selectedFiles.size > 0 && (
+                <button
+                  onClick={handlePermanentlyDeleteSelected}
+                  className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+                >
+                  Delete Selected
+                </button>
+              )}
+              <button
+                onClick={handlePermanentlyDeleteAll}
+                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+              >
+                🗑️ Empty Trash
               </button>
             </>
           )}
@@ -258,15 +293,26 @@ export default function FileManager({ data }: Props) {
                 {selectedFiles.has(item.id) && editingId !== item.id && (
                   <div className="mt-2 flex gap-2 justify-center">
                     {isTrash ? (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleRestore(item.id);
-                        }}
-                        className="text-xs px-2 py-1 bg-white text-blue-500 rounded"
-                      >
-                        Restore
-                      </button>
+                      <>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleRestore(item.id);
+                          }}
+                          className="text-xs px-2 py-1 bg-white text-blue-500 rounded"
+                        >
+                          Restore
+                        </button>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handlePermanentlyDelete(item.id);
+                          }}
+                          className="text-xs px-2 py-1 bg-white text-red-500 rounded"
+                        >
+                          Delete
+                        </button>
+                      </>
                     ) : (
                       <>
                         <button
@@ -351,15 +397,26 @@ export default function FileManager({ data }: Props) {
                 {selectedFiles.has(item.id) && editingId !== item.id && (
                   <div className="flex gap-2">
                     {isTrash ? (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleRestore(item.id);
-                        }}
-                        className="px-3 py-1 bg-white text-blue-500 rounded text-sm"
-                      >
-                        Restore
-                      </button>
+                      <>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleRestore(item.id);
+                          }}
+                          className="px-3 py-1 bg-white text-blue-500 rounded text-sm"
+                        >
+                          Restore
+                        </button>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            handlePermanentlyDelete(item.id);
+                          }}
+                          className="px-3 py-1 bg-white text-red-500 rounded text-sm"
+                        >
+                          Delete
+                        </button>
+                      </>
                     ) : (
                       <>
                         <button
