@@ -73,6 +73,8 @@ interface OSState {
   updateFile: (id: string, updates: Partial<FileSystemNode>) => void;
   deleteFile: (id: string) => void;
   restoreFile: (id: string) => void;
+  permanentlyDeleteFile: (id: string) => void;
+  permanentlyDeleteAll: () => void;
   
   addNotification: (notification: Omit<NotificationItem, 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
@@ -290,6 +292,37 @@ export const useStore = create<OSState>((set, get) => ({
       const newFileSystem = state.fileSystem.map(f =>
         f.id === id ? { ...f, isDeleted: false, parentId: 'root' } : f
       );
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
+  },
+
+  permanentlyDeleteFile: (id) => {
+    set(state => {
+      // Recursively find all items to delete (including children of folders)
+      const idsToDelete = new Set<string>();
+      const findChildren = (parentId: string) => {
+        state.fileSystem.forEach(f => {
+          if (f.parentId === parentId) {
+            idsToDelete.add(f.id);
+            if (f.type === 'folder') {
+              findChildren(f.id);
+            }
+          }
+        });
+      };
+      idsToDelete.add(id);
+      findChildren(id);
+
+      const newFileSystem = state.fileSystem.filter(f => !idsToDelete.has(f.id));
+      saveFileSystem(newFileSystem);
+      return { fileSystem: newFileSystem };
+    });
+  },
+
+  permanentlyDeleteAll: () => {
+    set(state => {
+      const newFileSystem = state.fileSystem.filter(f => !f.isDeleted);
       saveFileSystem(newFileSystem);
       return { fileSystem: newFileSystem };
     });
