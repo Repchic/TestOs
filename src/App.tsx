@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useStore } from './store';
 import Desktop from './components/Desktop';
 import MenuBar from './components/MenuBar';
@@ -26,6 +27,7 @@ function App() {
       <Dock />
       <Spotlight />
       <Notifications />
+      <SpeedInsights />
     </div>
   );
 }
